@@ -6,4 +6,14 @@ export const queryFields = [
   'minPrice',
   'maxPrice',
 ]
-export const cowFilterableFields = ['searchTerm', 'location', 'age']
+
+export const cropsFilterableFields = [
+  'searchTerm',
+  'name',
+  'category',
+  'location',
+  'season',
+  'price',
+  'quantity',
+  'harvestDate',
+]

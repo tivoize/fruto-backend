@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 import config from './config/index'
 import app from './app'
 
-async function boostrap() {
+async function DatabaseConnection() {
   try {
     await mongoose.connect(config.database_url as string)
     console.log(`🛢   Database is connected successfully`)
@@ -15,4 +15,4 @@ async function boostrap() {
   }
 }
 
-boostrap()
+DatabaseConnection()
