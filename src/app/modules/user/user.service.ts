@@ -47,21 +47,61 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
   return result
 }
 
-const getLoggedUser = async (id: JwtPayload): Promise<Partial<IUser> | null> => {
-  const result = await User.findById(id, {
-    username: 1,
-    phone: 1,
-    address: 1,
-    city: 1,
-    state: 1,
-    zip_code: 1,
-    country: 1,
-    _id: 1,
-  })
-  if (!result) {
+const getLoggedUser = async (id: JwtPayload): Promise<Partial<IUser>> => {
+  const userId = id;
+
+  if (!userId) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token payload: missing user ID')
+  }
+
+  const user = await User.findById(userId)
+    .select(
+      'username email phone address city state zip_code country role ' +
+      'farm_name farm_size produce_types ' +       // farmer
+      'company_name business_type tax_id ' +       // buyer
+      'fleet_size vehicle_types service_areas'     // logistics
+    )
+    .lean()
+
+  if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
-  return result
+
+  // Optionally: filter out irrelevant fields by role
+  const filteredUser: Partial<IUser> = {
+    _id: user._id,
+    email: user.email,
+    username: user.username,
+    phone: user.phone,
+    address: user.address,
+    city: user.city,
+    state: user.state,
+    zip_code: user.zip_code,
+    country: user.country,
+    role: user.role,
+  }
+
+  if (user.role === 'farmer') {
+    Object.assign(filteredUser, {
+      farm_name: user.farm_name,
+      farm_size: user.farm_size,
+      produce_types: user.produce_types,
+    })
+  } else if (user.role === 'buyer') {
+    Object.assign(filteredUser, {
+      company_name: user.company_name,
+      business_type: user.business_type,
+      tax_id: user.tax_id,
+    })
+  } else if (user.role === 'logistics') {
+    Object.assign(filteredUser, {
+      fleet_size: user.fleet_size,
+      vehicle_types: user.vehicle_types,
+      service_areas: user.service_areas,
+    })
+  }
+
+  return filteredUser
 }
 
 const updateLoggedUser = async (
