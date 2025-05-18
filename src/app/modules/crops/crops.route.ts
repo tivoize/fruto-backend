@@ -23,14 +23,14 @@ router.patch(
 )
 router.get(
   '/',
-  auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS),
+  // auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS),
   CropsController.getAllCrops
 )
 router.get(
   '/:id',
-  auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS),
+  // auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS),
   CropsController.getSingleCrops
 )
 router.delete('/:id', auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS), CropsController.deleteCrops)
 
-export const CropsRoutes = router
+export const CropsRoutes = router;

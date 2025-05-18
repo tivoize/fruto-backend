@@ -10,112 +10,128 @@ import { cropsSearchableFields } from './crops.constant';
 import cloudinary from 'cloudinary';
 
 const createCrops = async (payload: ICrop): Promise<ICrop | null> => {
-  console.log(payload )
-  let uploadedImageUrls: string[] = [];
+  try {
+    console.log(payload);
+    let uploadedImageUrls: string[] = [];
 
-  // Handle Cloudinary image uploads if any
-  if (payload.images && payload.images.length > 0) {
-    const uploadPromises = payload.images.map(img =>
-      cloudinary.v2.uploader.upload(img, {
-        folder: 'Fruto/Crops',
-      })
-    );
+    if (payload.images && payload.images.length > 0) {
+      const uploadPromises = payload.images.map(img =>
+        cloudinary.v2.uploader.upload(img, {
+          folder: 'Fruto/Crops',
+        })
+      );
 
-    const results = await Promise.all(uploadPromises);
-    uploadedImageUrls = results.map(result => result.secure_url);
+      const results = await Promise.all(uploadPromises);
+      uploadedImageUrls = results.map(result => result.secure_url);
+    }
+
+    const newCropData: ICrop = {
+      ...payload,
+      images: uploadedImageUrls,
+    };
+
+    const newCrop = await Crop.create(newCropData);
+    return newCrop;
+  } catch (error) {
+    console.error("Error creating crop:", error);
+    return null;
   }
-
-  // Create the crop with updated image URLs
-  const newCropData: ICrop = {
-    ...payload,
-    images: uploadedImageUrls,
-  };
-
-  const newCrop = await Crop.create(newCropData);
-  return newCrop;
 };
+
 
 const getAllCrops = async (
   filters: ICropFilters,
   queryOptions: IPaginationOptions
 ): Promise<IGenericResponse<ICrop[]>> => {
-  const { searchTerm, ...filtersData } = filters;
-  const { page, limit, sortBy, sortOrder, minPrice, maxPrice } =
-    queryHelpers.calculateQuery(queryOptions);
+  try {
+    const { searchTerm, ...filtersData } = filters;
+    const { page, limit, skip, sortBy, sortOrder, minPrice, maxPrice } =   queryHelpers.calculateQuery(queryOptions);
 
-  const andConditions = [];
+    // Build query conditions
+    const andConditions = [];
 
-  if (searchTerm) {
-    andConditions.push({
-      $or: cropsSearchableFields.map(field => ({
-        [field]: {
-          $regex: searchTerm,
-          $options: 'i',
-        },
-      })),
-    });
-  }
+    // Search term condition
+    if (searchTerm) {
+      andConditions.push({
+        $or: cropsSearchableFields.map(field => ({
+          [field]: {
+            $regex: searchTerm,
+            $options: 'i',
+          },
+        })),
+      });
+    }
 
-  if (minPrice !== undefined && maxPrice !== undefined) {
-    andConditions.push({
-      price: {
-        $gte: minPrice,
-        $lte: maxPrice,
+    // Price range conditions
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      const priceCondition: { $gte?: number; $lte?: number } = {};
+      
+      if (minPrice !== undefined) {
+        priceCondition.$gte = minPrice;
+      }
+      
+      if (maxPrice !== undefined) {
+        priceCondition.$lte = maxPrice;
+      }
+      
+      andConditions.push({ price_per_unit: priceCondition });
+    }
+
+    // Other filter conditions
+    if (Object.keys(filtersData).length) {
+      andConditions.push({
+        $and: Object.entries(filtersData).map(([field, value]) => {
+          // Handle array values (like categories)
+          if (Array.isArray(value)) {
+            return { [field]: { $in: value } };
+          }
+          return { [field]: value };
+        }),
+      });
+    }
+
+    // Combine all conditions
+    const whereConditions = andConditions.length > 0 ? { $and: andConditions } : {};
+
+    // Build sort conditions
+    const sortConditions: { [key: string]: SortOrder } = {};
+    if (sortBy && sortOrder) {
+      sortConditions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    } else {
+      // Default sort by created_at descending
+      sortConditions['created_at'] = -1;
+    }
+
+    // Execute query with MongoDB's built-in pagination
+    const crops = await Crop.find(whereConditions)
+      .sort(sortConditions)
+      .skip(skip)
+      .limit(limit);
+
+    // Get total count for pagination metadata
+    const total = await Crop.countDocuments(whereConditions);
+
+    return {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Crops retrieved successfully!',
+      meta: {
+        page,
+        limit,
+        total,
       },
-    });
-  } else if (minPrice !== undefined) {
-    andConditions.push({
-      price: {
-        $gte: minPrice,
-      },
-    });
-  } else if (maxPrice !== undefined) {
-    andConditions.push({
-      price: {
-        $lte: maxPrice,
-      },
-    });
+      data: crops,
+    };
+  } catch (error) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Error retrieving crops',
+      error instanceof Error ? error.message : String(error)
+    );
   }
-
-  if (Object.keys(filtersData).length) {
-    andConditions.push({
-      $and: Object.entries(filtersData).map(([field, value]) => ({
-        [field]: value,
-      })),
-    });
-  }
-
-  const sortConditions: { [key: string]: SortOrder } = {};
-  if (sortBy && sortOrder) {
-    sortConditions[sortBy] = sortOrder;
-  }
-
-  const whereConditions =
-    andConditions.length > 0 ? { $and: andConditions } : {};
-
-  const result = await Crop.find(whereConditions)
-    .sort(sortConditions)
- 
-
-  // Manual pagination
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedResult = result.slice(startIndex, endIndex);
-
-  const total = await Crop.countDocuments(whereConditions);
-
-  return {
-    meta: {
-      page,
-      limit,
-      total,
-    },
-    data: paginatedResult,
-  };
 };
-
 const getSingleCrops = async (id: string): Promise<ICrop | null> => {
-  const result = await Crop.findById(id)
+  const result = await Crop.findById(id).populate('farmer_id')
   return result;
 };
 

@@ -1,24 +1,42 @@
-import mongoose, {  Document } from "mongoose"
+import mongoose, {  Document, Types } from "mongoose"
 
 export type AgricultureType = "Organic" | "Conventional" | "Hydroponic" | "Biodynamic"
 export type CropCategory = "Fruits" | "Vegetables" | "Grains" | "Nuts" | "Herbs" | "Other"
 
-export interface ICrop extends Document {
-  name: string
-  farmer_id: mongoose.Types.ObjectId | string
-  images: string[]
-  price_per_unit: number
-  quantity_available: number
-  quantity_unit: string
-  location: string
-  agriculture_type: AgricultureType
-  classification: CropCategory
-  packaging: string
-  harvest_date: Date
-  created_at: Date
-  grown_in: string
+export interface IPaginationOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  minPrice?: number;
+  maxPrice?: number;
 }
 
-export type ICropFilters = {
-  searchTerm?: string
+
+export interface ICrop extends Document {
+  _id: Types.ObjectId;
+  name: string;
+  farmer_id: Types.ObjectId | string;
+  images: string[];
+  price_per_unit: number;
+  quantity_available: number;
+  quantity_unit: string;
+  location: string;
+  agriculture_type: string;
+  classification: string;
+  packaging: string;
+  harvest_date: Date;
+  grown_in?: string;
+  created_at: Date;
+  updated_at?: Date;
+}
+
+export interface ICropFilters {
+  searchTerm?: string;
+  location?: string;
+  agriculture_type?: string;
+  classification?: string;
+  grown_in?: string;
+  farmer_id?: Types.ObjectId | string;
+  [key: string]: any;
 }

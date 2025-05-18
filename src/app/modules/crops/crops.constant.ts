@@ -42,4 +42,10 @@ export const growingEnvironments = [
   'Hydroponic System',
 ] as const
 
-export const cropsSearchableFields = ['name', 'location', 'category'];
+export const cropsSearchableFields = [
+  'name',
+  'location',
+  'agriculture_type',
+  'classification',
+  'grown_in'
+];

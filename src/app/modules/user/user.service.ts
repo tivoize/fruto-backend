@@ -49,7 +49,7 @@ const deleteUser = async (id: string): Promise<IUser | null> => {
 
 const getLoggedUser = async (id: JwtPayload): Promise<Partial<IUser>> => {
   const userId = id;
-
+  console.log(userId,'52')
   if (!userId) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid token payload: missing user ID')
   }

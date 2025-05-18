@@ -1,12 +1,15 @@
 import { IGenericErrorMessage } from './error'
 
-export type IGenericResponse<T> = {
+export interface IGenericResponse<T> {
+  statusCode: number;
+  success: boolean;
+  message: string;
   meta: {
-    page: number
-    limit: number
-    total: number
-  }
-  data: T
+    page: number;
+    limit: number;
+    total: number;
+  };
+  data: T;
 }
 
 export type IGenericErrorResponse = {
