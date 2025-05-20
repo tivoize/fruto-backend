@@ -39,4 +39,10 @@ export type UserModel = {
     givenPassword: string,
     savedPassword: string
   ): Promise<boolean>
+
+  // <-- add this signature (use whatever return type makes sense)
+  isVerifiedUserExist(
+    userId: string
+  ): any
 } & Model<IUser>
+

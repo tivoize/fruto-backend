@@ -38,6 +38,50 @@ const getBookingsByFarmerId = async (farmerId: string) => {
     .sort({ createdAt: -1 })
 }
 
+
+const updateBookingStatusByFarmer = async (
+  bookingId: string,
+  farmerId: string,
+  updates: {
+    status?: 'pending' | 'confirmed' | 'cancelled';
+    payment_status?: 'not_paid' | 'paid' | 'cancelled';
+  }
+) => {
+  // 🔍 Find booking owned by farmer
+  const booking = await Booking.findOne({ _id: bookingId, farmer_id: farmerId });
+
+  if (!booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+  }
+
+  if (
+    updates.status &&
+    booking.status !== 'pending' &&
+    updates.status === 'pending'
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Cannot change status back to 'pending' once it's confirmed or cancelled"
+    );
+  }
+
+  // ✅ Update allowed fields
+  if (updates.status) booking.status = updates.status;
+  if (updates.payment_status) booking.payment_status = updates.payment_status;
+
+  await booking.save();
+
+  // 🔁 Return updated and populated
+  return await Booking.findById(booking._id).populate([
+    'crop_id',
+    'farmer_id',
+    'buyer_id',
+  ]);
+};
+
+export default updateBookingStatusByFarmer;
+
+
 // Delete a booking
 const deleteBooking = async (id: string) => {
   const booking = await Booking.findById(id)
