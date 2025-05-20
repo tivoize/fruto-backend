@@ -3,6 +3,8 @@ import { UserRoutes } from '../modules/user/user.route'
 
 import { AuthRoute } from '../modules/auth/auth.route'
 import { CropsRoutes } from '../modules/crops/crops.route'
+import { ReviewRoutes } from '../modules/review/review.route'
+import { BookingRoutes } from '../modules/booking/booking.route'
 
 const router = express.Router()
 
@@ -21,6 +23,15 @@ const moduleRoutes = [
   {
     path: '/crops',
     route: CropsRoutes,
+  },
+  
+  {
+    path: '/reviews',
+    route: ReviewRoutes,
+  },
+  {
+    path: '/bookings',
+    route: BookingRoutes,
   }
   
  

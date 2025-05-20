@@ -11,23 +11,24 @@ import cloudinary from 'cloudinary';
 
 const createCrops = async (payload: ICrop): Promise<ICrop | null> => {
   try {
-    console.log(payload);
-    let uploadedImageUrls: string[] = [];
+    // console.log(payload);
+    // let uploadedImageUrls: string[] = [];
 
-    if (payload.images && payload.images.length > 0) {
-      const uploadPromises = payload.images.map(img =>
-        cloudinary.v2.uploader.upload(img, {
-          folder: 'Fruto/Crops',
-        })
-      );
+    // if (payload.images && payload.images.length > 0) {
+    //   const uploadPromises = payload.images.map(img =>
+    //     cloudinary.v2.uploader.upload(img, {
+    //       folder: 'Fruto/Crops',
+    //     })
+    //   );
 
-      const results = await Promise.all(uploadPromises);
-      uploadedImageUrls = results.map(result => result.secure_url);
-    }
+    //   const results = await Promise.all(uploadPromises);
+    //   uploadedImageUrls = results.map(result => result.secure_url);
+    // }
 
-    const newCropData: ICrop = {
-      ...payload,
-      images: uploadedImageUrls,
+    const newCropData: any = {
+     ...payload,
+      images: payload.images || [],
+      created_at: new Date()
     };
 
     const newCrop = await Crop.create(newCropData);

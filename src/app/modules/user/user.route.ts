@@ -20,7 +20,7 @@ router.get(
 
 router.get('/', auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS), UserController.getAllUsers)
 router.patch('/:id', auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS), UserController.updateUser)
-router.get('/:id', auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS), UserController.getSingleUser)
+router.get('/:id',  UserController.getSingleUser)
 router.delete('/:id', auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.LOGISTICS), UserController.deleteUser)
 
 export const UserRoutes = router;

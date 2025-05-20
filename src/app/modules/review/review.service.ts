@@ -33,8 +33,8 @@ const getAllReview = async () => {
     .sort({ createdAt: -1 });
 };
 
-const getReviewByServiceId = async (serviceId: string) => {
-  return await Review.find({ serviceId })
+const getReviewByCropId = async (cropId: string) => {
+  return await Review.find({ cropId })
     .populate('userId')
     .sort({ createdAt: -1 });
 };
@@ -55,11 +55,11 @@ const deleteReviewFromDB = async (id: string) => {
   return await Review.findByIdAndDelete(id);
 };
 
-export const ReviewServices = {
+export const ReviewCrops = {
   postReview,
   postProviderReview,
   getAllReview,
-  getReviewByServiceId,
+  getReviewByCropId,
   getReviewByProviderId,
   deleteReviewFromDB,
 };

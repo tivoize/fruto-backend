@@ -8,14 +8,14 @@ import { ReviewController } from './review.controller';
 const router = express.Router();
 router.post(
   '/',
-  validateRequest(ReviewValidation.reviewZodSchema),
-  auth(ENUM_USER_ROLE.BUYER),
+//   validateRequest(ReviewValidation.reviewZodSchema),
+  auth(ENUM_USER_ROLE.BUYER,ENUM_USER_ROLE.FARMER),
   ReviewController.postReview
 );
 router.post(
   '/provider',
-  // validateRequest(ReviewValidation.reviewZodSchema),
-  auth(ENUM_USER_ROLE.BUYER),
+  validateRequest(ReviewValidation.reviewZodSchema),
+  auth(ENUM_USER_ROLE.BUYER,ENUM_USER_ROLE.FARMER),
   ReviewController.postProviderReview
 );
 router.get(
@@ -25,8 +25,8 @@ router.get(
 );
 router.get(
   '/:id',
-  auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.BUYER),
-  ReviewController.getReviewByServiceId
+//   auth(ENUM_USER_ROLE.BUYER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.FARMER,ENUM_USER_ROLE.BUYER),
+  ReviewController.getReviewByCropId
 );
 router.get(
   '/provider/:id',

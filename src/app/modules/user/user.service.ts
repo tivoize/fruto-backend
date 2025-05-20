@@ -4,19 +4,39 @@ import { IUser } from './user.interface'
 import { User } from './user.model'
 import { JwtPayload } from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-
+import { Review } from '../review/review.model'
+import  Crop  from '../crops/crops.model'
 const getAllUsers = async (): Promise<IUser[]> => {
   const result = await User.find()
   return result
 }
 
-const getSingleUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findById(id)
-  if (!result) {
+
+
+interface IUserWithRelations extends IUser {
+  reviews: any[]
+  crops: any[]
+}
+
+const getSingleUser = async (id: string): Promise<IUserWithRelations> => {
+  const user = await User.findById(id)
+  if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist')
   }
-  return result
+
+  // Find all reviews by this user
+  const reviews = await Review.find({ user_id: id })
+
+  // Find all crops where this user is the farmer
+  const crops = await Crop.find({ farmer_id: id })
+
+  return {
+    ...user.toObject(),
+    reviews,
+    crops,
+  }
 }
+
 
 const updateUser = async (
   id: string,

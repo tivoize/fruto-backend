@@ -1,9 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IReview } from './review.interface';
 
-// Define an interface representing a Review document
-
-
 const reviewSchema = new Schema<IReview>(
   {
     rating: {
@@ -14,7 +11,7 @@ const reviewSchema = new Schema<IReview>(
       type: String,
       required: true,
     },
-    productId: {
+    cropId: {
       type: Schema.Types.ObjectId,
       ref: 'Crop',
       required: true,
@@ -23,6 +20,10 @@ const reviewSchema = new Schema<IReview>(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    isAnonymous: {
+      type: Boolean,
+      default: false,
     },
   },
   {

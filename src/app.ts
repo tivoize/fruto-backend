@@ -1,3 +1,4 @@
+import bodyParser from "body-parser";
 import express, { Application, NextFunction, Request, Response } from 'express'
 import cors from 'cors'
 import routes from './app/routes/index'
@@ -20,8 +21,8 @@ app.use('/api/v1/', routes)
 
 app.use(globalErrorHandler)
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 //handle not found
 app.use((req: Request, res: Response, next: NextFunction) => {

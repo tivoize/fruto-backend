@@ -1,13 +1,13 @@
 import httpStatus from 'http-status';
 import sendResponse from '../../../shared/sendResponse';
-import { ReviewServices } from './review.service';
 import catchAsync from '../../../shared/catchAsync';
 import { RequestHandler } from 'express';
+import { ReviewCrops } from './review.service';
 
 const postReview: RequestHandler = catchAsync(async (req, res) => {
   const userId = req?.user?.userId;
   console.log(userId,'10')
-  const result = await ReviewServices.postReview(req.body,userId);
+  const result = await ReviewCrops.postReview(req.body,userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -19,7 +19,7 @@ const postReview: RequestHandler = catchAsync(async (req, res) => {
 const postProviderReview: RequestHandler = catchAsync(async (req, res) => {
   const userId = req?.user?.userId;
  
-  const result = await ReviewServices.postProviderReview(req.body,userId);
+  const result = await ReviewCrops.postProviderReview(req.body,userId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -32,7 +32,7 @@ const postProviderReview: RequestHandler = catchAsync(async (req, res) => {
 
 
 const getAllReview: RequestHandler = catchAsync(async (req, res) => {
-  const result = await ReviewServices.getAllReview();
+  const result = await ReviewCrops.getAllReview();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -41,9 +41,9 @@ const getAllReview: RequestHandler = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getReviewByServiceId: RequestHandler = catchAsync(async (req, res) => {
+const getReviewByCropId: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await ReviewServices.getReviewByServiceId(id);
+  const result = await ReviewCrops.getReviewByCropId(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -54,7 +54,7 @@ const getReviewByServiceId: RequestHandler = catchAsync(async (req, res) => {
 });
 const getReviewByProviderId: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await ReviewServices.getReviewByProviderId(id);
+  const result = await ReviewCrops.getReviewByProviderId(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -65,7 +65,7 @@ const getReviewByProviderId: RequestHandler = catchAsync(async (req, res) => {
 });
 const deleteReviewFromDB: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await ReviewServices.deleteReviewFromDB(id);
+  const result = await ReviewCrops.deleteReviewFromDB(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -79,7 +79,7 @@ export const ReviewController = {
   postReview,
   postProviderReview,
   getAllReview,
-  getReviewByServiceId,
+  getReviewByCropId,
   getReviewByProviderId,
   deleteReviewFromDB
 };

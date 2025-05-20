@@ -3,8 +3,9 @@ import { Types } from "mongoose";
 export interface IReview extends Document {
   rating: number;
   comment: string;
-  productId: Types.ObjectId;
+  cropId: Types.ObjectId;
   userId: Types.ObjectId;
+  isAnonymous: Boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
